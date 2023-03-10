@@ -1,0 +1,153 @@
+---
+title: "Neural Network Practice"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include = FALSE}
+library(learnr)
+library(nnet)
+library(NeuralNetTools)
+library(ggplot2)
+data(iris)
+summary(iris)
+
+knitr::opts_chunk$set(echo = FALSE)
+
+# Project 1 code (setup so that it will carry over across exercise boxes)
+set.seed(810)
+train <- sample(1:nrow(iris), 100)
+iris.train <- iris[train, ]
+iris.test <- iris[-train, ]
+nn.iris <- nnet(Species ~ Petal.Length + Petal.Width, iris.train, size = 4)
+nn.iris.all <- nnet(Species ~ ., iris.train, size = 4)
+```
+
+*This project is from Schmuller (2018). Other ML data sets can be found at: https://archive.ics.uci.edu/ml/datasets.php*
+
+## Project 1
+
+### Train an algorithm to predict species of iris flowers based on its characteristics
+
+*Let's work through this first project together!*
+
+By setting the seed, you can make the random selection of observations start on the same number. This means that the same sample be picked each time, and the results will be replicable. Then, we'll use random sampling to create a training set and a test set within our data.
+
+```{r data, exercise = TRUE}
+# Set the seed
+set.seed(810)
+
+# Establish the training and test data
+train <- sample(1:nrow(iris), 100)
+iris.train <- iris[train, ]
+iris.test <- iris[-train, ]
+```
+
+Next, we'll use the training set to train a neural network with *four* hidden layers. The commented out command includes all of the variables in the formula, hence the dot, but we'll run the first version.
+
+```{r network, exercise = TRUE}
+# Train neural network with only petal characteristics
+nn.iris <- nnet(Species ~ Petal.Length + Petal.Width, iris.train, size = 4)
+
+# Train neural network with all characteristics
+  # Feel free to test this one out by changing the code in the following boxes to fit nn.iris.all
+# nn.iris.all <- nnet(Species ~ ., iris.train, size = 4)
+```
+
+We can simply use summary() to summarize an output for the model, but we can also plot it for a visual representation.
+
+```{r output, exercise = TRUE}
+# Print out the summary
+summary(nn.iris)
+
+# Plot the model
+plotnet(nn.iris)
+```
+
+Finally, let's test the model. Variable importance is based on connection weights in the neural network. In this case, there are a few incorrectly identified flowers and the Petal.Width variable seems to be more important than the Petal.Length variable.
+
+```{r predict, exercise = TRUE}
+# Make predictions using the model and the test set
+predictions <-  predict(nn.iris, iris.test, type = "class")
+
+# Create actual versus predicted table
+table(iris.test$Species, predictions)
+
+# Graph out the variable importance
+olden(nn.iris)
+```
+
+## Project 2
+
+### Train an algorithm to predict whether the currency is fake or not
+
+*Because so much of the code builds off of previous lines, this exercise will be done in one box. Follow through the steps and guiding comments to complete the exercise!*
+
+Refer to the coding structure of Project 1 as an example for this exercise.
+
+```{r step1, exercise = TRUE, exercise.lines = 51}
+  ## Set up data by un-commenting out the following code and setting your working directory
+# setwd()
+# banknote <- read.table("lesson_17_data_banknote_authentication.txt", 
+                      # header = FALSE, sep = ",", 
+                      # col.names = c("variance", "skewness", "kurtosis", "enthropy", "class"))
+# banknote$class <- as.factor(banknote$class)
+
+
+# STEP 1: Look at the data. Plot two variables against each other and by class (where 1 = legit and 0 = fake) 
+# and see if you can find a pattern. For example, you could plot enthropy versus kurtosis and see 
+# whether it is easy to separate fake and real money. You can also try different variables. 
+
+  ## Plot #1
+
+  ## Plot #2
+
+
+# STEP 2: Create a training and test set. Set the seed at 810 again, select half of the data set 
+# for your sample (so the amount in the sample will be nrow(data)/2), 
+# and then create the test and training data sets.
+
+  ## Set the seed
+
+  ## Divide training and test data
+
+
+# STEP 3: Create a neural network to predict legit (1) versus fake (0) currency with THREE hidden layers.
+# Summarize the model and draw the graph.
+
+  ## Create neural network
+
+  ## Summarize model
+
+  ## Plot model
+
+
+# STEP 4: Use the model you just made to predict information in the test data. Since the result is a
+# classification, do not forget to specify type = "class".
+
+  ## Predict results in the test set
+
+
+# STEP 5: Evaluate your model. You can do this by creating a table showing the actual versus predicted 
+# class variable. What percentage were you able to predict correctly?
+
+  ## Create actual vs predicted table
+
+# STEP 6: Plot the variable importance graph using olden(). Which variable is the most important?
+
+  ## Graph variable importance
+
+```
+
+Let's answer those questions!
+```{r quiz, echo = FALSE}
+quiz(
+  question_text("What percentage were you able to predict correctly?",
+                answer("100", correct = TRUE), allow_retry = TRUE,
+                answer("100%", correct = TRUE)),
+  question("Which variable is the most important?",
+           type = "learnr_radio", answer("variance", correct = TRUE),
+           answer("kurtosis", correct = FALSE), answer("skewness", correct = FALSE),
+           answer("enthropy", correct = FALSE), random_answer_order = TRUE)
+)
+```
